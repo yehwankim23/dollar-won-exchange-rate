@@ -19,9 +19,11 @@ run_program = True
 
 URL = "https://finance.naver.com/marketindex/exchangeDetail.naver?marketindexCd=FX_USDKRW"
 
+CHANNEL_ID = "@dwexr"
 
-def send_message(text: str) -> None:
-    BOT.send_message(CHAT_ID, text)
+
+def send_message(text: str, chat_id: int | str = CHAT_ID) -> None:
+    BOT.send_message(chat_id, text)
 
 
 def send_error_message() -> None:
@@ -144,7 +146,7 @@ def main() -> None:
 
                     if previous_floor != 0 and current_floor != previous_floor:
                         send_message(exchange_rate + "원 "
-                                     + "↓" if current_floor < previous_floor else "↑")
+                                     + "↓" if current_floor < previous_floor else "↑", CHANNEL_ID)
 
                     previous_floor = current_floor
             else:
