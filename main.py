@@ -146,7 +146,7 @@ def main() -> None:
 
                     if previous_floor != 0 and current_floor != previous_floor:
                         send_message(exchange_rate + "원 "
-                                     + "↓" if current_floor < previous_floor else "↑", CHANNEL_ID)
+                                     + ("↓" if current_floor < previous_floor else "↑"), CHANNEL_ID)
 
                     previous_floor = current_floor
             else:
