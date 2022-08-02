@@ -106,7 +106,17 @@ def main() -> None:
     # noinspection PyBroadException
     try:
         check = True
-        previous_floor = 0
+
+        soup = bs4.BeautifulSoup(requests.get(URL).text, "html.parser")
+        container = soup.find("div", recursive=False, id="container")
+        content = container.find("div", recursive=False, id="content")
+        section = content.find("div", class_="section_calculator", recursive=False)
+        table = section.find("table", recursive=False)
+        tbody = table.find("tbody", recursive=False)
+        tr = tbody.find("tr", recursive=False)
+        td = tr.find("td", recursive=False)
+        exchange_rate = str(td.contents[0])
+        previous_floor = float(exchange_rate.replace(",", "")) // 5
 
         updater = telegram.ext.Updater(TOKEN)
         dispatcher = updater.dispatcher
@@ -146,11 +156,11 @@ def main() -> None:
                     exchange_rate = str(td.contents[0])
                     current_floor = float(exchange_rate.replace(",", "")) // 5
 
-                    if previous_floor != 0 \
-                            and (current_floor != previous_floor
-                                 or (today.minute == 0 and today.hour in [9, 15, 21])):
+                    if current_floor != previous_floor:
                         send_message(exchange_rate + "원 "
                                      + ("↓" if current_floor < previous_floor else "↑"), CHANNEL_ID)
+                    elif today.hour in [9, 15, 21] and today.minute == 0:
+                        send_message(exchange_rate + "원", CHANNEL_ID)
 
                     previous_floor = current_floor
             else:
