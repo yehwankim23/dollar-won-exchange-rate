@@ -130,7 +130,9 @@ def main() -> None:
             if not run_program:
                 continue
 
-            if datetime.datetime.now().minute % 15 == 0:
+            today = datetime.datetime.now()
+
+            if today.minute % 15 == 0:
                 if check:
                     check = False
                     soup = bs4.BeautifulSoup(requests.get(URL).text, "html.parser")
@@ -144,7 +146,9 @@ def main() -> None:
                     exchange_rate = str(td.contents[0])
                     current_floor = float(exchange_rate.replace(",", "")) // 5
 
-                    if previous_floor != 0 and current_floor != previous_floor:
+                    if previous_floor != 0 \
+                            and (current_floor != previous_floor
+                                 or (today.minute == 0 and today.hour in [9, 15, 21])):
                         send_message(exchange_rate + "원 "
                                      + ("↓" if current_floor < previous_floor else "↑"), CHANNEL_ID)
 
