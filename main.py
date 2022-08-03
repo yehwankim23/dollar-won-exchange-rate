@@ -100,6 +100,18 @@ def resume(update: telegram.Update, context: telegram.ext.CallbackContext) -> No
         send_error_message()
 
 
+def get_exchange_rate() -> str:
+    soup = bs4.BeautifulSoup(requests.get(URL).text, "html.parser")
+    container = soup.find("div", recursive=False, id="container")
+    content = container.find("div", recursive=False, id="content")
+    section = content.find("div", class_="section_calculator", recursive=False)
+    table = section.find("table", recursive=False)
+    tbody = table.find("tbody", recursive=False)
+    tr = tbody.find("tr", recursive=False)
+    td = tr.find("td", recursive=False)
+    return str(td.contents[0])
+
+
 def main() -> None:
     global run_program, pong
 
@@ -108,15 +120,7 @@ def main() -> None:
         check_exchange_rate = True
         check_running = True
 
-        soup = bs4.BeautifulSoup(requests.get(URL).text, "html.parser")
-        container = soup.find("div", recursive=False, id="container")
-        content = container.find("div", recursive=False, id="content")
-        section = content.find("div", class_="section_calculator", recursive=False)
-        table = section.find("table", recursive=False)
-        tbody = table.find("tbody", recursive=False)
-        tr = tbody.find("tr", recursive=False)
-        td = tr.find("td", recursive=False)
-        exchange_rate = str(td.contents[0])
+        exchange_rate = get_exchange_rate()
         previous_floor = float(exchange_rate.replace(",", "")) // 5
 
         updater = telegram.ext.Updater(TOKEN)
@@ -147,15 +151,7 @@ def main() -> None:
                 if check_exchange_rate:
                     check_exchange_rate = False
 
-                    soup = bs4.BeautifulSoup(requests.get(URL).text, "html.parser")
-                    container = soup.find("div", recursive=False, id="container")
-                    content = container.find("div", recursive=False, id="content")
-                    section = content.find("div", class_="section_calculator", recursive=False)
-                    table = section.find("table", recursive=False)
-                    tbody = table.find("tbody", recursive=False)
-                    tr = tbody.find("tr", recursive=False)
-                    td = tr.find("td", recursive=False)
-                    exchange_rate = str(td.contents[0])
+                    exchange_rate = get_exchange_rate()
                     current_floor = float(exchange_rate.replace(",", "")) // 5
 
                     if current_floor != previous_floor:
