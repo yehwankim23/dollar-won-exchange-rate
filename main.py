@@ -105,7 +105,8 @@ def main() -> None:
 
     # noinspection PyBroadException
     try:
-        check = True
+        check_exchange_rate = True
+        check_running = True
 
         soup = bs4.BeautifulSoup(requests.get(URL).text, "html.parser")
         container = soup.find("div", recursive=False, id="container")
@@ -143,8 +144,9 @@ def main() -> None:
             today = datetime.datetime.now()
 
             if today.minute % 15 == 0:
-                if check:
-                    check = False
+                if check_exchange_rate:
+                    check_exchange_rate = False
+
                     soup = bs4.BeautifulSoup(requests.get(URL).text, "html.parser")
                     container = soup.find("div", recursive=False, id="container")
                     content = container.find("div", recursive=False, id="content")
@@ -159,12 +161,17 @@ def main() -> None:
                     if current_floor != previous_floor:
                         send_message(exchange_rate + "원 "
                                      + ("↓" if current_floor < previous_floor else "↑"), CHANNEL_ID)
-                    elif today.hour in [9, 15, 21] and today.minute == 0:
-                        send_message(exchange_rate + "원", CHANNEL_ID)
 
                     previous_floor = current_floor
             else:
-                check = True
+                check_exchange_rate = True
+
+            if today.hour in [9, 15, 21]:
+                if check_running:
+                    check_running = False
+                    send_message("Program running")
+            else:
+                check_running = True
 
             if pong:
                 pong = False
