@@ -155,8 +155,8 @@ def main() -> None:
                     current_floor = float(exchange_rate.replace(",", "")) // 5
 
                     if current_floor != previous_floor:
-                        send_message(exchange_rate + "원 "
-                                     + ("↓" if current_floor < previous_floor else "↑"), CHANNEL_ID)
+                        send_message(("▽" if current_floor < previous_floor else "△") + " "
+                                     + exchange_rate + "원", CHANNEL_ID)
 
                     previous_floor = current_floor
             else:
