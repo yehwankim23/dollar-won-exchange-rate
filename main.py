@@ -109,7 +109,7 @@ def get_exchange_rate() -> str:
     tbody = table.find("tbody", recursive=False)
     tr = tbody.find("tr", recursive=False)
     td = tr.find("td", recursive=False)
-    return str(td.contents[0])
+    return str(td.contents[0])[:-1]
 
 
 def main() -> None:
