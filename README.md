@@ -13,7 +13,7 @@ sudo apt install python3-pip -y
 ```
 
 ```bash
-pip3 install beautifulsoup4 python-telegram-bot requests
+pip3 install requests beautifulsoup4 python-telegram-bot --upgrade
 ```
 
 ```bash
