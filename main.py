@@ -156,7 +156,7 @@ def main() -> None:
 
                     if current_floor != previous_floor:
                         send_message(("▽" if current_floor < previous_floor else "△") + " "
-                                     + exchange_rate + "원", CHANNEL_ID)
+                                     + exchange_rate + " 원", CHANNEL_ID)
 
                     previous_floor = current_floor
             else:
