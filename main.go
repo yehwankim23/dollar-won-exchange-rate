@@ -71,7 +71,7 @@ func getExchangeRate() (string, float64, bool) {
 		return "", 0, false
 	}
 
-	return exchangeRateString, math.Floor(exchangeRateFloat / 5), true
+	return exchangeRateString, exchangeRateFloat, true
 }
 
 func main() {
@@ -98,11 +98,13 @@ func main() {
 		return
 	}
 
-	_, previousFloor, ok := getExchangeRate()
+	_, previousFloat, ok := getExchangeRate()
 
 	if !ok {
 		return
 	}
+
+	previousDivision := int(math.Floor(previousFloat / 5))
 
 	sendMessage("Program started")
 
@@ -118,23 +120,22 @@ func main() {
 			if checkExchangeRate {
 				checkExchangeRate = false
 
-				exchangeRate, currentFloor, ok := getExchangeRate()
+				currentString, currentFloat, ok := getExchangeRate()
 
 				if !ok {
 					break
 				}
 
-				if currentFloor != previousFloor {
-					triangle := "△"
+				currentDivision := int(math.Floor(currentFloat / 5))
+				currentModulo := int(math.Round(currentFloat)) % 5
 
-					if currentFloor < previousFloor {
-						triangle = "▽"
-					}
-
-					sendMessage(triangle + " " + exchangeRate + " 원")
+				if currentDivision > previousDivision && currentModulo > 2 {
+					sendMessage("△ " + currentString + " 원")
+					previousDivision = currentDivision
+				} else if currentDivision < previousDivision && currentModulo < 2 {
+					sendMessage("▽ " + currentString + " 원")
+					previousDivision = currentDivision
 				}
-
-				previousFloor = currentFloor
 			}
 		} else {
 			checkExchangeRate = true
