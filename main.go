@@ -54,23 +54,24 @@ func getExchangeRate() (string, float64, bool) {
 		return "", 0, false
 	}
 
-	exchangeRate := ""
+	exchangeRateString := ""
 
 	for node := range document.Descendants() {
 		if node.Type == html.ElementNode && node.Data == "td" {
-			exchangeRate = node.FirstChild.Data
+			exchangeRateString = node.FirstChild.Data
 			break
 		}
 	}
 
-	exchangeRateFloat, err := strconv.ParseFloat(strings.ReplaceAll(exchangeRate, ",", ""), 64)
+	exchangeRateString = strings.TrimSuffix(strings.ReplaceAll(exchangeRateString, ",", ""), "0")
+	exchangeRateFloat, err := strconv.ParseFloat(exchangeRateString, 64)
 
 	if err != nil {
 		sendLog(function, err.Error())
 		return "", 0, false
 	}
 
-	return exchangeRate, math.Floor(exchangeRateFloat / 5), true
+	return exchangeRateString, math.Floor(exchangeRateFloat / 5), true
 }
 
 func main() {
