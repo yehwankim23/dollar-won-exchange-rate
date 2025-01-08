@@ -127,12 +127,13 @@ func main() {
 				}
 
 				currentDivision := int(math.Floor(currentFloat / 5))
-				currentModulo := int(math.Round(currentFloat)) % 5
+				currentModulo := int(math.Floor(currentFloat)) % 5
+				difference := currentDivision - previousDivision
 
-				if currentDivision > previousDivision && currentModulo > 2 {
+				if (difference == 1 && currentModulo >= 2) || difference > 1 {
 					sendMessage("△ " + currentString + " 원")
 					previousDivision = currentDivision
-				} else if currentDivision < previousDivision && currentModulo < 2 {
+				} else if (difference == -1 && currentModulo <= 2) || difference < -1 {
 					sendMessage("▽ " + currentString + " 원")
 					previousDivision = currentDivision
 				}
