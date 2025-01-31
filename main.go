@@ -106,7 +106,7 @@ func main() {
 
 	previousDivision := int(math.Floor(previousFloat / 5))
 
-	sendMessage("Program started")
+	sendLog(function, "Program started")
 
 	checkExchangeRate := true
 	checkRunning := true
@@ -126,15 +126,16 @@ func main() {
 					break
 				}
 
+				currentFloat += 2.5
 				currentDivision := int(math.Floor(currentFloat / 5))
-				currentModulo := int(math.Floor(currentFloat)) % 5
+				currentModulo := math.Mod(currentFloat, 5)
 				difference := currentDivision - previousDivision
 
-				if (difference == 1 && currentModulo >= 2) || difference > 1 {
+				if (difference == 1 && currentModulo >= 2.5) || difference > 1 {
 					sendMessage("△ " + currentString + " 원")
 					previousDivision = currentDivision
-				} else if (difference == -1 && currentModulo <= 2) || difference < -1 {
-					sendMessage("▽ " + currentString + " 원")
+				} else if (difference == -1 && currentModulo < 2.5) || difference < -1 {
+					sendMessage("▼ " + currentString + " 원")
 					previousDivision = currentDivision
 				}
 			}
@@ -142,7 +143,7 @@ func main() {
 			checkExchangeRate = true
 		}
 
-		if now.Hour()%6 == 0 {
+		if now.Hour() == 12 {
 			if checkRunning {
 				checkRunning = false
 
@@ -153,5 +154,5 @@ func main() {
 		}
 	}
 
-	sendMessage("Program stopped")
+	sendLog(function, "Program stopped")
 }
