@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"math"
 	"net/http"
@@ -12,8 +13,12 @@ import (
 	"golang.org/x/net/html"
 )
 
+type DataJson struct {
+	PreviousDivision int `json:"previousDivision"`
+}
+
 func send(chatId string, function string, text string) error {
-	log.Printf("%-16s %-20s %s\n", chatId, function, text)
+	log.Printf("%-16s %-24s %s\n", chatId, function, text)
 
 	_, err := http.Get("https://api.telegram.org/bot" + os.Getenv("bot_token") +
 		"/sendMessage?chat_id=" + chatId + "&text=" + text)
@@ -23,14 +28,6 @@ func send(chatId string, function string, text string) error {
 
 func sendLog(function string, log string) {
 	send(os.Getenv("user_chat_id"), function, log)
-}
-
-func sendMessage(message string) {
-	err := send(os.Getenv("channel_chat_id"), "", message)
-
-	if err != nil {
-		sendLog("sendMessage", err.Error())
-	}
 }
 
 func getExchangeRate() (string, float64, bool) {
@@ -74,6 +71,36 @@ func getExchangeRate() (string, float64, bool) {
 	return exchangeRateString, exchangeRateFloat, true
 }
 
+func savePreviousDivision(previousDivision int) {
+	function := "savePreviousDivision"
+
+	dataJson := DataJson{
+		PreviousDivision: previousDivision,
+	}
+
+	dataBytes, err := json.Marshal(dataJson)
+
+	if err != nil {
+		sendLog(function, err.Error())
+		return
+	}
+
+	err = os.WriteFile("./data/data.json", dataBytes, 0600)
+
+	if err != nil {
+		sendLog(function, err.Error())
+		return
+	}
+}
+
+func sendMessage(message string) {
+	err := send(os.Getenv("channel_chat_id"), "", message)
+
+	if err != nil {
+		sendLog("sendMessage", err.Error())
+	}
+}
+
 func main() {
 	function := "main"
 
@@ -104,7 +131,22 @@ func main() {
 		return
 	}
 
-	previousDivision := int(math.Floor(previousFloat / 5))
+	dataBytes, err := os.ReadFile("./data/data.json")
+	var previousDivision int
+
+	if err != nil {
+		previousDivision = int(math.Floor(previousFloat / 5))
+	} else {
+		var dataJson DataJson
+		err = json.Unmarshal(dataBytes, &dataJson)
+
+		if err != nil {
+			sendLog(function, err.Error())
+			return
+		}
+
+		previousDivision = dataJson.PreviousDivision
+	}
 
 	sendLog(function, "Program started")
 
@@ -132,11 +174,13 @@ func main() {
 				difference := currentDivision - previousDivision
 
 				if (difference == 1 && currentModulo >= 2.5) || difference > 1 {
+					previousDivision = currentDivision
+					savePreviousDivision(previousDivision)
 					sendMessage("△ " + currentString + " 원")
-					previousDivision = currentDivision
 				} else if (difference == -1 && currentModulo < 2.5) || difference < -1 {
-					sendMessage("▼ " + currentString + " 원")
 					previousDivision = currentDivision
+					savePreviousDivision(previousDivision)
+					sendMessage("▼ " + currentString + " 원")
 				}
 			}
 		} else {
