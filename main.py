@@ -119,7 +119,7 @@ def main():
 
                     if (difference == 1 and current_modulo >= 2.5) or difference > 1:
                         send_message(f"△ {current_string} 원")
-                    elif (difference == -1 and current_modulo < 2.5) or difference < 1:
+                    elif (difference == -1 and current_modulo < 2.5) or difference < -1:
                         send_message(f"▼ {current_string} 원")
 
                     previous_division = current_division
