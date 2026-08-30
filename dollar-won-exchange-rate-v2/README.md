@@ -10,6 +10,13 @@
 - `user_chat_id`
 - `channel_chat_id`
 
+### Persistent Storage
+
+Directory Mount
+
+- Source Directory : `/data/coolify/applications/*/data`
+- Destination Directory : `/app/data`
+
 ## 사용법
 
 [달러원 환율](https://t.me/s/dwexr)
